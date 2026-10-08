@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pareto en maintenance – Terminale Bac Pro MSPC</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--ink:#1c2733;--mute:#5b6b7b;--line:#d5dce3;--A:#d9480f;--B:#e8a317;--C:#8a99a8;--ok:#2b8a3e;--ko:#c92a2a;--acc:#1c4e80;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171e;--card:#18222c;--ink:#e6ecf1;--mute:#9fb0c0;--line:#2c3a47;--A:#ff7a3d;--B:#f2b632;--C:#7d8d9d;--ok:#51cf66;--ko:#ff6b6b;--acc:#74b0ea}}
+:root[data-theme="dark"]{--bg:#10171e;--card:#18222c;--ink:#e6ecf1;--mute:#9fb0c0;--line:#2c3a47;--A:#ff7a3d;--B:#f2b632;--C:#7d8d9d;--ok:#51cf66;--ko:#ff6b6b;--acc:#74b0ea}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,h3,button,table,.tag,label{font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif}
+h1{font-size:2rem;line-height:1.15;margin:.2em 0}
+h2{font-size:1.35rem;margin:0 0 .5em;color:var(--acc)}
+section{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px;margin:18px 0}
+.lead{color:var(--mute);margin:0 0 .5em}
+.tag{display:inline-block;font-size:.8rem;padding:2px 9px;border-radius:3px;background:var(--acc);color:var(--card);font-weight:700}
+.big{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.big div{flex:1 1 200px;border-left:5px solid var(--A);padding:6px 12px;background:var(--bg)}
+.big b{font-family:"Trebuchet MS",Arial,sans-serif;font-size:1.5rem;display:block}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+th{color:var(--mute);font-weight:700}
+td input{width:80px;padding:4px;font-size:1rem;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:3px}
+.zA{color:var(--A);font-weight:700}.zB{color:var(--B);font-weight:700}.zC{color:var(--C);font-weight:700}
+button{font-size:.95rem;padding:8px 14px;border:1px solid var(--acc);background:transparent;color:var(--acc);border-radius:4px;cursor:pointer;margin:3px 6px 3px 0}
+button.on,button:hover{background:var(--acc);color:var(--card)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--B);outline-offset:2px}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0}
+.ctl input[type=range]{flex:1 1 180px}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--ink);font-family:"Trebuchet MS",Arial,sans-serif;font-size:11px}
+.msg{background:var(--bg);border-left:5px solid var(--acc);padding:10px 14px;margin:10px 0;border-radius:3px}
+ol.steps{padding-left:1.2em}ol.steps li{margin:.4em 0}
+.q{margin:16px 0;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.q p{margin:.2em 0 .5em;font-weight:700;font-family:"Trebuchet MS",Arial,sans-serif}
+.fb{margin:6px 0 0;font-size:.95rem}
+.ok{color:var(--ok)}.ko{color:var(--ko)}
+.ref{font-size:.93rem;color:var(--mute)}
+tfoot td{font-weight:700;border-top:2px solid var(--ink)}
+tr.cur{background:rgba(232,163,23,.28)}
+.calc{background:var(--bg);border-left:5px solid var(--B);padding:10px 14px;margin:10px 0;border-radius:3px;min-height:5.5em;font:.95rem/1.6 "Trebuchet MS",Arial,sans-serif}
+@keyframes pop{from{background:rgba(232,163,23,.8)}to{background:rgba(232,163,23,.28)}}
+@media (prefers-reduced-motion:no-preference){tr.cur td{animation:pop .9s}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<span class="tag">Terminale Bac Pro MSPC · Gestion de la maintenance</span>
+<h1>Le diagramme de Pareto : trouver les pannes qui coûtent le plus</h1>
+<p class="lead">Dans un atelier, il y a toujours trop de pannes pour tout régler en même temps. Pareto t'aide à choisir par quoi commencer.</p>
+</header>
+
+<section>
+<h2>1. L'idée en deux minutes</h2>
+<p>Vilfredo Pareto, un économiste italien, a remarqué que <b>peu de causes expliquent la plupart des effets</b>. En maintenance, on le retrouve presque partout :</p>
+<div class="big">
+<div><b>20 %</b>des types de pannes</div>
+<div><b>80 %</b>du temps d'arrêt de la machine</div>
+</div>
+<p>Ce n'est pas une loi exacte : c'est un ordre de grandeur. Le vrai message : <b>si je traite les 2 ou 3 pannes les plus lourdes, je gagne beaucoup plus qu'en traitant toutes les petites.</b></p>
+<p class="ref">À retenir pour la suite : on classe les causes de la plus pénalisante à la moins pénalisante, puis on cumule.</p>
+</section>
+
+<section>
+<h2>2. Cas concret : la conditionneuse de l'atelier</h2>
+<p>Voici les arrêts relevés dans la GMAO sur un mois, pour une ligne de conditionnement. Choisis ton critère, puis <b>modifie les valeurs</b> : le diagramme se met à jour.</p>
+<div class="ctl" role="group" aria-label="Critère de classement">
+<button id="bMin" class="on">Durée d'arrêt (min)</button>
+<button id="bNb">Nombre d'interventions</button>
+<button id="bRaz">Remettre les valeurs</button>
+</div>
+<div class="tablewrap"><table id="saisie"><thead><tr><th>Cause de panne</th><th id="unite">Minutes</th></tr></thead><tbody></tbody><tfoot><tr><td>Total (somme)</td><td id="tot1"></td></tr></tfoot></table></div>
+</section>
+
+<section>
+<h2>3. Le diagramme de Pareto</h2>
+<p>Les barres sont triées de la plus grande à la plus petite. La courbe montre le <b>cumul en %</b>. Déplace le curseur pour fixer la limite de la zone A.</p>
+<div class="ctl"><label for="seuil">Zone A jusqu'à <b id="sv">80</b> % du total</label><input id="seuil" type="range" min="50" max="90" value="80"></div>
+<svg id="chart" viewBox="0 0 700 360" role="img" aria-label="Diagramme de Pareto des causes de panne"></svg>
+<p><span class="zA">■ Zone A</span> : à traiter en priorité &nbsp; <span class="zB">■ Zone B</span> : à surveiller &nbsp; <span class="zC">■ Zone C</span> : peu d'effet</p>
+<div class="msg" id="msg"></div>
+<div class="msg"><b>Les deux formules à retenir</b><br>% d'une cause = valeur de la cause ÷ total × 100<br>% cumulé = % cumulé de la ligne du dessus + % de la ligne</div>
+<div class="ctl" role="group" aria-label="Calcul pas à pas">
+<button id="bStart">Calculer pas à pas</button><button id="bPrev">Précédent</button><button id="bNext">Suivant</button><button id="bAuto">Lecture auto</button><button id="bAll">Tout afficher</button>
+</div>
+<div class="calc" id="calc" aria-live="polite"></div>
+<div class="tablewrap"><table id="tri"><thead><tr><th>Rang</th><th>Cause</th><th>Valeur</th><th>%</th><th>% cumulé</th><th>Zone</th></tr></thead><tbody></tbody><tfoot><tr><td></td><td>Total</td><td></td><td>100 %</td><td></td><td></td></tr></tfoot></table></div>
+</section>
+
+<section>
+<h2>4. Comment construire un Pareto (méthode)</h2>
+<ol class="steps">
+<li><b>Choisir le critère</b> : temps d'arrêt, nombre de pannes, coût… Le critère change le résultat !</li>
+<li><b>Relever les données</b> sur une période (GMAO, rapports d'intervention).</li>
+<li><b>Classer</b> les causes de la plus grande valeur à la plus petite (« Autres » à la fin).</li>
+<li><b>Calculer</b> le pourcentage de chaque cause, puis le pourcentage cumulé.</li>
+<li><b>Tracer</b> les barres et la courbe des cumuls, puis repérer les zones A, B, C.</li>
+<li><b>Décider</b> : lancer une action corrective sur la zone A (analyse des causes, amélioration, maintenance préventive).</li>
+</ol>
+<p class="ref">Lien avec le référentiel MSPC : exploiter les données de la GMAO, analyser les défaillances, justifier des choix d'amélioration de la disponibilité, rendre compte à l'écrit ou à l'oral. Le Pareto est l'outil qui permet d'argumenter « pourquoi on traite cette panne en premier ». Il se combine avec le TRS et l'analyse des causes (5 pourquoi, Ishikawa).</p>
+</section>
+
+<section>
+<h2>5. Teste-toi</h2>
+<div id="quiz"></div>
+</section>
+</main>
+
+<script>
+(function(){
+var NOMS=["Bourrage convoyeur","Capteur de présence HS","Fuite hydraulique","Courroie patinée","Défaut variateur","Réglage de format","Étiqueteuse encrassée","Défaut air comprimé","Bouton d'arrêt d'urgence","Autres (petits arrêts)"];
+var INIT={min:[450,280,110,50,30,25,20,15,10,10],nb:[8,31,5,14,6,22,18,4,3,25]};
+var st=1e9,guided=false,TRI=[],TOT=0,timer=null;
+var mode="min",vals={min:INIT.min.slice(),nb:INIT.nb.slice()};
+var $=function(i){return document.getElementById(i)};
+var NS="http://www.w3.org/2000/svg";
+function colOf(z){return z==="A"?"var(--A)":z==="B"?"var(--B)":"var(--C)"}
+function saisie(){
+ var tb=$("saisie").tBodies[0];tb.innerHTML="";
+ $("unite").textContent=mode==="min"?"Minutes d'arrêt":"Nombre d'interventions";
+ NOMS.forEach(function(n,i){
+  var tr=document.createElement("tr"),a=document.createElement("td"),b=document.createElement("td"),inp=document.createElement("input");
+  a.textContent=n;inp.type="number";inp.min=0;inp.value=vals[mode][i];inp.setAttribute("aria-label",n);
+  inp.addEventListener("input",function(){var v=parseFloat(inp.value);vals[mode][i]=isNaN(v)||v<0?0:v;draw()});
+  b.appendChild(inp);tr.appendChild(a);tr.appendChild(b);tb.appendChild(tr)});
+}
+function draw(){
+ var seuil=+$("seuil").value;$("sv").textContent=seuil;
+ var rows=NOMS.map(function(n,i){return{n:n,v:vals[mode][i],autre:i===NOMS.length-1}});
+ var tri=rows.filter(function(r){return !r.autre}).sort(function(a,b){return b.v-a.v});
+ tri.push(rows[rows.length-1]);
+ var tot=tri.reduce(function(s,r){return s+r.v},0);
+ var svg=$("chart");svg.innerHTML="";
+ $("tot1").textContent=tot+" "+unit();
+ if(tot<=0){$("msg").textContent="Saisis des valeurs supérieures à 0.";$("tri").tBodies[0].innerHTML="";return}
+ var cum=0,aDone=false;
+ tri.forEach(function(r){
+  r.p=r.v/tot*100;var prev=cum;cum+=r.p;r.c=cum;
+  if(!aDone){r.z="A";if(cum>=seuil)aDone=true}else r.z=(prev<95)?"B":"C";
+ });
+ var L=50,R=650,T=20,B=250,W=R-L,H=B-T,mx=Math.max.apply(null,tri.map(function(r){return r.v})),n=tri.length,bw=W/n;
+ function el(t,a,txt){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);if(txt!==undefined)e.textContent=txt;svg.appendChild(e);return e}
+ for(var g=0;g<=4;g++){var y=B-H*g/4;el("line",{x1:L,x2:R,y1:y,y2:y,stroke:"var(--line)"});
+  el("text",{x:L-6,y:y+4,"text-anchor":"end"},Math.round(mx*g/4));el("text",{x:R+6,y:y+4},(g*25)+"%")}
+ el("line",{x1:L,x2:R,y1:B-H*seuil/100,y2:B-H*seuil/100,stroke:"var(--A)","stroke-dasharray":"5 4"});
+ var pts=[];
+ tri.forEach(function(r,i){
+  var h=H*r.v/mx,x=L+i*bw+bw*.12;
+  el("rect",{x:x,y:B-h,width:bw*.76,height:h,fill:colOf(r.z),opacity:(guided&&i>=st)?0.2:1});
+  var cx=L+i*bw+bw/2;if(!guided||i<st)pts.push(cx+","+(B-H*r.c/100));
+  var t=el("text",{x:cx,y:B+12,"text-anchor":"end",transform:"rotate(-35 "+cx+" "+(B+12)+")"},r.n.length>20?r.n.slice(0,19)+"…":r.n);
+ });
+ el("polyline",{points:pts.join(" "),fill:"none",stroke:"var(--ink)","stroke-width":2});
+ pts.forEach(function(p){var s=p.split(",");el("circle",{cx:s[0],cy:s[1],r:3.5,fill:"var(--ink)"})});
+ var nA=tri.filter(function(r){return r.z==="A"}).length,pA=tri.filter(function(r){return r.z==="A"}).reduce(function(s,r){return s+r.p},0);
+ $("msg").innerHTML="Sur <b>"+n+"</b> causes, seulement <b>"+nA+"</b> ("+Math.round(nA/n*100)+" % des causes) expliquent <b>"+Math.round(pA)+" %</b> du total. Priorité : <b>"+tri.filter(function(r){return r.z==="A"}).map(function(r){return r.n}).join(", ")+"</b>.";
+ TRI=tri;TOT=tot;renderTable();
+}
+function setMode(m){mode=m;$("bMin").className=m==="min"?"on":"";$("bNb").className=m==="nb"?"on":"";saisie();draw()}
+$("bMin").onclick=function(){setMode("min")};$("bNb").onclick=function(){setMode("nb")};
+$("bRaz").onclick=function(){vals={min:INIT.min.slice(),nb:INIT.nb.slice()};saisie();draw()};
+$("seuil").oninput=draw;
+
+function fmt(x){return x.toFixed(1).replace(".",",")}
+function unit(){return mode==="min"?"min":"interv."}
+function renderTable(){
+ var n=TRI.length;if(st>n)st=n;
+ var tb=$("tri").tBodies[0];tb.innerHTML="";
+ TRI.forEach(function(r,i){var tr=document.createElement("tr"),sh=!guided||i<st;
+  if(guided&&i===st-1)tr.className="cur";
+  [i+1,r.n,r.v,sh?fmt(r.p)+" %":"…",sh?fmt(r.c)+" %":"…",sh?r.z:"…"].forEach(function(x,j){var td=document.createElement("td");td.textContent=x;if(j===5&&sh)td.className="z"+r.z;tr.appendChild(td)});tb.appendChild(tr)});
+ $("tri").tFoot.rows[0].cells[2].textContent=TOT;
+ var h,u=unit();
+ if(!guided)h="Clique sur « Calculer pas à pas » pour voir d'où viennent les % et les cumuls.";
+ else if(st===0)h="<b>Étape 0 : le total.</b><br>On additionne toutes les valeurs : "+TRI.map(function(r){return r.v}).join(" + ")+" = <b>"+TOT+" "+u+"</b>.<br>Ce total représente 100 %. Clique sur Suivant.";
+ else{var r=TRI[st-1];
+  h="<b>Ligne "+st+" : "+r.n+"</b><br>% = "+r.v+" ÷ "+TOT+" × 100 = <b>"+fmt(r.p)+" %</b><br>% cumulé = "+(st===1?"première ligne, donc le cumul est égal au % : ":fmt(TRI[st-2].c)+" (cumul précédent) + "+fmt(r.p)+" = ")+"<b>"+fmt(r.c)+" %</b>"+(st===n?"<br>Le cumul final fait 100 % : le calcul est vérifié.":"");}
+ $("calc").innerHTML=h;
+}
+function stop(){if(timer){clearInterval(timer);timer=null;$("bAuto").textContent="Lecture auto"}}
+$("bStart").onclick=function(){stop();guided=true;st=0;draw()};
+$("bPrev").onclick=function(){stop();if(!guided){guided=true;st=TRI.length}if(st>0)st--;draw()};
+$("bNext").onclick=function(){stop();if(!guided){guided=true;st=0}else if(st<TRI.length)st++;draw()};
+$("bAll").onclick=function(){stop();guided=false;draw()};
+$("bAuto").onclick=function(){if(timer){stop();return}guided=true;if(st>=TRI.length)st=0;$("bAuto").textContent="Pause";timer=setInterval(function(){if(st<TRI.length){st++;draw()}else stop()},1300)};
+var QS=[
+ {q:"Pourquoi classe-t-on les causes de la plus grande à la plus petite ?",o:["Pour que le graphique soit plus joli","Pour voir tout de suite quelles causes pèsent le plus","Pour supprimer les petites pannes"],a:1,e:"Le tri fait ressortir les causes prioritaires dès la première barre."},
+ {q:"Une cause représente 45 % des minutes d'arrêt, une autre 28 %. Leur cumul est de :",o:["73 %","17 %","45 %"],a:0,e:"On additionne : 45 + 28 = 73 %. C'est le principe du pourcentage cumulé."},
+ {q:"Dans le cas de la conditionneuse, le critère « nombre d'interventions » donne un autre classement que « minutes d'arrêt ». Que faut-il en conclure ?",o:["Une des deux méthodes est fausse","Le critère choisi doit correspondre à l'objectif (disponibilité, coût, charge de travail)","Pareto ne sert à rien"],a:1,e:"Beaucoup de petites pannes rapides ne pèsent pas comme un bourrage qui arrête la ligne longtemps."},
+ {q:"Que fait-on de la zone A ?",o:["On l'ignore, c'est la zone la plus faible","On lance en priorité une analyse des causes et une action corrective","On attend qu'elle passe en zone C"],a:1,e:"La zone A concentre l'essentiel des pertes : c'est là que l'action rapporte le plus."},
+ {q:"Où trouve-t-on les données pour construire un Pareto de pannes ?",o:["Dans l'historique de la GMAO et les rapports d'intervention","Dans le plan de la machine","Dans la notice du fabricant uniquement"],a:0,e:"L'historique des interventions fournit durées, causes et fréquences."}
+];
+var qz=$("quiz");
+QS.forEach(function(Q,qi){
+ var d=document.createElement("div");d.className="q";
+ var p=document.createElement("p");p.textContent=(qi+1)+". "+Q.q;d.appendChild(p);
+ var fb=document.createElement("p");fb.className="fb";fb.setAttribute("aria-live","polite");
+ Q.o.forEach(function(t,oi){var b=document.createElement("button");b.textContent=t;
+  b.onclick=function(){var good=oi===Q.a;fb.className="fb "+(good?"ok":"ko");fb.textContent=(good?"Bonne réponse. ":"Pas tout à fait. ")+Q.e};d.appendChild(b)});
+ d.appendChild(fb);qz.appendChild(d)});
+saisie();draw();
+})();
+</script>
+</body>
+</html>
